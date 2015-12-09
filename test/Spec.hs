@@ -45,15 +45,26 @@ instance Show H.Html where
 
 tests = [
         testGroup "ParseTests" [
-            testProperty "Parse html with 1 image" prop_parse_one_image
+            testProperty "Parse html with some images" prop_parse_images,
+            testProperty "Parse html with some images and show labels" prop_classified_parse_images
           ]
         ]
 
-prop_parse_one_image page =
--- (images page)
+prop_parse_images page =
 -- ["foo.png"]
+-- (take 4 (images page))
    map URL.exportURL (images page) == getImages(Renderer.Utf8.renderHtml (html page)) where
       types = (page::HtmlWithImages)
 
+prop_classified_parse_images page =
+  classify (length (images page) == 0) "no images" $
+  classify (length (images page) == 1) "1 image" $
+  classify (length (images page) > 1 && length (images page) <= 5) "some images" $
+  classify (length (images page) > 5) "many images" $
+  prop_parse_images(page)
+
+
 main :: IO ()
 main = defaultMain tests
+--main = quickCheck prop_classified_parse_images
+--main = sample (arbitrary :: Gen URL.URL)
