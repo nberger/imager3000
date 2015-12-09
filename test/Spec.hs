@@ -33,7 +33,7 @@ tests = [
         ]
 
 prop_parse_one_image page =
-  ["foo.png"] == getImages $ Utf8.renderHtml page where
+  ["foo.png"] == getImages ( Utf8.renderHtml page ) where
       types = (page::Html)
 
 main :: IO ()
