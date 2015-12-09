@@ -18,13 +18,15 @@ import qualified Text.Blaze.Html.Renderer.String as Renderer.String (renderHtml)
 
 import Imager3000.Parse
 
+makeLiWithImage :: String -> H.Html
+makeLiWithImage image = H.li $ H.img H.! src (H.stringValue image)
+
 makeImagesHtml :: [String] -> H.Html
 makeImagesHtml images = H.docTypeHtml $ do
                      H.body $ do
                        H.p "A list of images:"
                        H.ul $
-                         forM_ images $
-                           \image -> H.li $ H.img H.! src image
+                         forM_ images makeLiWithImage
 
 data HtmlWithImages = HtmlWithImages { images :: [String]
                                      , html :: H.Html
@@ -35,7 +37,7 @@ genUrl = listOf1 arbitrary
 
 instance Arbitrary HtmlWithImages where
   arbitrary = do
-    images <- listOf genUrl
+    images <- listOf1 genUrl
     return (HtmlWithImages { images = images, html = makeImagesHtml images })
 
 instance Show H.Html where
