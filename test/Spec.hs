@@ -21,7 +21,7 @@ makeImagesHtml n = docTypeHtml $ do
                        p "A list of images:"
                        img ! src "foo.png"
 
-instance Arbitrary Html5 where
+instance Arbitrary Html where
   arbitrary = makeImagesHtml <$> choose (10, 200)
 
 tests = [
