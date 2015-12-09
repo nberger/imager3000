@@ -13,22 +13,33 @@ import Test.QuickCheck.Arbitrary
 
 import qualified Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
-import qualified Text.Blaze.Html.Renderer.Utf8 as Utf8 (renderHtml)
-import qualified Text.Blaze.Html.Renderer.String as String (renderHtml)
+import qualified Text.Blaze.Html.Renderer.Utf8 as Renderer.Utf8 (renderHtml)
+import qualified Text.Blaze.Html.Renderer.String as Renderer.String (renderHtml)
 
 import Imager3000.Parse
 
-makeImagesHtml :: Int -> H.Html
-makeImagesHtml n = H.docTypeHtml $ do
+makeImagesHtml :: [String] -> H.Html
+makeImagesHtml images = H.docTypeHtml $ do
                      H.body $ do
                        H.p "A list of images:"
-                       H.img H.! src "foo.png"
+                       H.ul $
+                         forM_ images $
+                           \image -> H.li $ H.img H.! src image
 
-instance Arbitrary H.Html where
-  arbitrary = makeImagesHtml <$> choose (10, 200)
+data HtmlWithImages = HtmlWithImages { images :: [String]
+                                     , html :: H.Html
+                                     } deriving (Show)
+
+genUrl :: Gen String
+genUrl = listOf1 arbitrary
+
+instance Arbitrary HtmlWithImages where
+  arbitrary = do
+    images <- listOf genUrl
+    return (HtmlWithImages { images = images, html = makeImagesHtml images })
 
 instance Show H.Html where
-  show html = String.renderHtml html
+  show html = Renderer.String.renderHtml html
 
 tests = [
         testGroup "ParseTests" [
@@ -37,8 +48,10 @@ tests = [
         ]
 
 prop_parse_one_image page =
-  ["foo.png"] == getImages ( Utf8.renderHtml page ) where
-      types = (page::H.Html)
+-- (images page)
+-- ["foo.png"]
+   (images page) == getImages(Renderer.Utf8.renderHtml (html page)) where
+      types = (page::HtmlWithImages)
 
 main :: IO ()
 main = defaultMain tests
