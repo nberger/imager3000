@@ -14,6 +14,7 @@ import Test.QuickCheck.Arbitrary
 import Text.Blaze.Html5 as H
 import Text.Blaze.Html5.Attributes as A
 import qualified Text.Blaze.Html.Renderer.Utf8 as Utf8 (renderHtml)
+import qualified Text.Blaze.Html.Renderer.String as String (renderHtml)
 
 import Imager3000.Parse
 
@@ -25,6 +26,9 @@ makeImagesHtml n = docTypeHtml $ do
 
 instance Arbitrary Html where
   arbitrary = makeImagesHtml <$> choose (10, 200)
+
+instance Show Html where
+  show html = String.renderHtml html
 
 tests = [
         testGroup "ParseTests" [
