@@ -48,6 +48,7 @@ test-suite imager3000-test
   build-depends:       base
                      , imager3000
                      , blaze-html
+                     , url
                      , QuickCheck >= 2
                      , test-framework
                      , test-framework-quickcheck2
