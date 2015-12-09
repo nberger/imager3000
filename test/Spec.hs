@@ -61,10 +61,19 @@ prop_classified_parse_images page =
   classify (length (images page) == 1) "1 image" $
   classify (length (images page) > 1 && length (images page) <= 5) "some images" $
   classify (length (images page) > 5) "many images" $
-  prop_parse_images(page)
+  prop_parse_images page
 
+prop_collect_parse_images page =
+  collect (length (images page)) $
+  prop_parse_images page
+
+prop_cover_parse_images page =
+  cover (length (images page) > 10) 80 "at least 10 images" $
+  prop_parse_images page
 
 main :: IO ()
-main = defaultMain tests
+--main = defaultMain tests
 --main = quickCheck prop_classified_parse_images
+--main = quickCheck prop_collect_parse_images
+--main = quickCheck prop_cover_parse_images
 --main = sample (arbitrary :: Gen URL.URL)
